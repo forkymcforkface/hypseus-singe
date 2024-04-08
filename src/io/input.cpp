@@ -748,33 +748,36 @@ void process_event(SDL_Event *event)
             process_joystick_hat_motion(event);
         }
         break;
-    case SDL_JOYBUTTONDOWN:
-        if (g_use_gamepad) break;
-        reset_idle(); // added by JFA for -idleexit
+	case SDL_JOYBUTTONDOWN:
+		if (g_use_gamepad) break;
+		reset_idle(); // added by JFA for -idleexit
 
-        // loop through map and find corresponding action
-        for (i = 0; i < SWITCH_COUNT; i++) {
-            if (event->jbutton.which == joystick_buttons_map[i][0]
-                            && event->jbutton.button == joystick_buttons_map[i][1]-1) {
-                if (i == SWITCH_COIN1) hotkey = true;
-                input_enable(i, NOMOUSE);
-                break;
-            }
-        }
-
-        break;
-    case SDL_CONTROLLERBUTTONDOWN:
-        reset_idle(); // added by JFA for -idleexit
-        // loop through map and find corresponding action
-        for (i = 0; i < SWITCH_COUNT; i++) {
-            if (event->cbutton.button == joystick_buttons_map[i][1]-1) {
-                if (i == SWITCH_COIN1) hotkey = true;
-                input_enable(i, NOMOUSE);
-                if (g_haptic[0] && enabled_haptic)
-                    SDL_GameControllerRumble(g_gamepad_id, g_haptic[0], g_haptic[0], g_haptic[1]);
-                break;
-            }
-        }
+		// loop through map and find corresponding action
+		for (i = 0; i < SWITCH_COUNT; i++) {
+			if (event->jbutton.which == joystick_buttons_map[i][0]
+							&& event->jbutton.button == joystick_buttons_map[i][1]-1) {
+				if (g_use_gamepad && i == SWITCH_COIN1)
+					hotkey = true;
+				else if (!g_use_gamepad && i == SWITCH_BUTTON1)
+					hotkey = true;
+				input_enable(i, NOMOUSE);
+				break;
+			}
+		}
+		break;
+	case SDL_CONTROLLERBUTTONDOWN:
+		reset_idle(); // added by JFA for -idleexit
+		// loop through map and find corresponding action
+		for (i = 0; i < SWITCH_COUNT; i++) {
+			if (event->cbutton.button == joystick_buttons_map[i][1]-1) {
+				if (g_use_gamepad && i == SWITCH_COIN1)
+					hotkey = true;
+				else if (!g_use_gamepad && i == SWITCH_BUTTON1)
+					hotkey = true;
+				input_enable(i, NOMOUSE);
+				break;
+			}
+		}
 
         break;
     case SDL_JOYBUTTONUP:
